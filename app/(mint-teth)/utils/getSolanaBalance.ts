@@ -2,7 +2,7 @@ import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { parseUnits } from "viem";
 
-const eclipseRpcUrl = process.env.NEXT_PUBLIC_ECLIPSE_RPC;
+const eclipseRpcUrl = "https://mainnetbeta-rpc.eclipse.xyz";
 
 export async function getSolanaBalance(
   userAddress: string,

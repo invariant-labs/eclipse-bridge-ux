@@ -1,6 +1,5 @@
 "use client";
 import { NetworkProvider } from "@/app/contexts/NetworkContext";
-import useEthereumData from "@/lib/ethUtils";
 import { useState } from "react";
 import { SkeletonTheme } from "react-loading-skeleton";
 
@@ -17,11 +16,11 @@ import MintAndRedeem from "./(mint-teth)/components/MintAndRedeem";
 
 export default function Main() {
   const [selectedOption, setSelectedOption] = useState(Options.Mainnet);
-  const { gasPrice, ethPrice, blockNumber } = useEthereumData(selectedOption);
+
   const walletClient = useWalletClient();
 
   return (
-    <EthereumDataContext.Provider value={[gasPrice, ethPrice, blockNumber]}>
+    <EthereumDataContext.Provider value={[null, null, null]}>
       <NetworkProvider
         selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}

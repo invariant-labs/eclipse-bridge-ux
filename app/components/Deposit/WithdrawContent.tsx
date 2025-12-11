@@ -36,12 +36,9 @@ import { useWallets } from "@/app/hooks/useWallets";
 import { evmProvidersSelector } from "@dynamic-labs/ethereum-core";
 
 const client = createPublicClient({
-  chain:
-    process.env.NEXT_PUBLIC_CURRENT_CHAIN === "mainnet" ? mainnet : sepolia,
-  transport:
-    process.env.NEXT_PUBLIC_CURRENT_CHAIN === "mainnet"
-      ? http("https://eth.llamarpc.com")
-      : http("https://sepolia.drpc.org"),
+  chain: mainnet,
+  transport: http("https://eth.llamarpc.com"),
+
   cacheTime: 0,
 });
 
@@ -237,7 +234,9 @@ export const WithdrawContent: React.FC<WithdrawContentProps> = ({
               </div>
             </div>
             <div
-              className={`${evmWallet ? "" : "hidden"} amount-input-bottom flex flex-row justify-between w-full items-center`}
+              className={`${
+                evmWallet ? "" : "hidden"
+              } amount-input-bottom flex flex-row justify-between w-full items-center`}
             >
               {solWallet && (
                 <div className="balance-info w-full">
