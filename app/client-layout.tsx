@@ -16,47 +16,31 @@ const ibmPlexSans = IBM_Plex_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const passGlobalLayout = pathname === "/gas-station";
-  if (passGlobalLayout) {
-    return (
-      <WagmiProvider>
-        {() => {
-          return (
-            <GasProviders>
-              <ErrorBoundary>
-                <body className={ibmPlexSans.className}>{children}</body>
-              </ErrorBoundary>
-            </GasProviders>
-          );
-        }}
-      </WagmiProvider>
-    );
-  }
-
+export default function ClientLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="dark">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <Suspense>
-        <WalletFilterProvider>
-          <WagmiProvider>
-            {({ chains }) => {
-              return (
+      <body className={ibmPlexSans.className}>
+        <Suspense>
+          <WalletFilterProvider>
+            <WagmiProvider>
+              {({ chains }) => (
                 <DynamicProvider chains={chains}>
                   <ErrorBoundary>
-                    <body className={ibmPlexSans.className}>
-                      <Providers chains={chains}>{children}</Providers>
-                    </body>
+                    <Providers chains={chains}>{children}</Providers>
                   </ErrorBoundary>
                 </DynamicProvider>
-              );
-            }}
-          </WagmiProvider>
-        </WalletFilterProvider>
-      </Suspense>
+              )}
+            </WagmiProvider>
+          </WalletFilterProvider>
+        </Suspense>
+      </body>
     </html>
   );
 }

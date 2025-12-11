@@ -1,13 +1,6 @@
 import "./sidebar.css";
 import Link from "next/link";
-import {
-  BridgeIcon,
-  TethIcon,
-  ScanIcon,
-  GasStationIcon,
-  EcosystemIcon,
-  TusdIcon,
-} from "@/app/components/icons";
+import { TethIcon } from "@/app/components/icons";
 import { NetworkSwitcher } from "../Deposit/NetworkSwitcher";
 import { useState, type ReactNode } from "react";
 import { toKebabCase } from "@/lib/stringUtils";
@@ -34,10 +27,10 @@ const ToggleIcon: React.FC<{ isExtended: boolean }> = ({ isExtended }) => {
       <path
         d="M8.33509 13.3333L5.88564 10.8839C5.39749 10.3957 5.39749 9.60421 5.88564 9.11604L8.33509 6.66663M14.1685 13.3333L11.719 10.8839C11.2308 10.3957 11.2308 9.60421 11.719 9.11604L14.1685 6.66663"
         stroke="white"
-        stroke-opacity="0.3"
-        stroke-width="1.7971"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeOpacity="0.3"
+        strokeWidth="1.7971"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -65,7 +58,9 @@ const SidebarItem: React.FC<{
       target={targetHref.includes("https") ? "_blank" : ""}
     >
       <div
-        className={`side-item flex flex-row items-center ${pathName.slice(1) === toKebabCase(name) ? "highlight-icon" : ""}`}
+        className={`side-item flex flex-row items-center ${
+          pathName.slice(1) === toKebabCase(name) ? "highlight-icon" : ""
+        }`}
         style={{
           gap: "11px",
           padding: isExtended ? "4px" : "0px",
@@ -98,7 +93,7 @@ const SidebarItem: React.FC<{
                 style={{ stroke: "none" }}
                 d="M5 7.5V0.5L1.17033 3.18077C0.601614 3.57887 0.601616 4.42113 1.17033 4.81923L5 7.5Z"
                 fill="white"
-                fill-opacity="0.08"
+                fillOpacity="0.08"
               />
             </svg>
             <div className="sidebar-hover flex items-center justify-center">
@@ -128,33 +123,8 @@ export const Sidebar: React.FC<{
         >
           <SidebarItem
             isExtended={isExtended}
-            name="Bridge"
-            icon={<BridgeIcon />}
-          />
-          <SidebarItem
-            isExtended={isExtended}
-            name="Gas Station"
-            icon={<GasStationIcon />}
-          />
-          <SidebarItem
-            isExtended={isExtended}
             name="Mint tETH"
             icon={<TethIcon />}
-          />
-          <SidebarItem
-            isExtended={isExtended}
-            name="Mint tUSD"
-            icon={<TusdIcon />}
-          />
-          <SidebarItem
-            isExtended={isExtended}
-            name="Eclipsescan"
-            icon={<ScanIcon />}
-          />
-          <SidebarItem
-            isExtended={isExtended}
-            name="Ecosystem"
-            icon={<EcosystemIcon />}
           />
         </div>
       </div>

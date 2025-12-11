@@ -1,64 +1,111 @@
-'use client';
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+"use client";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
-import { getLastDeposits, getNonce, getEclipseTransaction, checkDepositWithPDA } from "@/lib/activityUtils";
+import {
+  getLastDeposits,
+  getNonce,
+  getEclipseTransaction,
+  checkDepositWithPDA,
+} from "@/lib/activityUtils";
 import { useNetwork } from "@/app/contexts/NetworkContext";
-import { useWallets } from '@/app/hooks/useWallets';
-import { getWithdrawalsByAddress, WithdrawObject, getWithdrawalPda } from "@/lib/withdrawUtils";
-import { Options } from '@/lib/networkUtils';
+import { useWallets } from "@/app/hooks/useWallets";
+import {
+  getWithdrawalsByAddress,
+  WithdrawObject,
+  getWithdrawalPda,
+} from "@/lib/withdrawUtils";
+import { Options } from "@/lib/networkUtils";
 
-import { createPublicClient, PublicClient, http } from 'viem';
+import { createPublicClient, PublicClient, http } from "viem";
 import { mainnet, sepolia } from "viem/chains";
 import { useRequests, queryRequests } from "@reservoir0x/relay-kit-hooks";
 
-import { Transaction, defaultTransaction, TransactionContextType, WithdrawActivity } from "./types";
+import {
+  Transaction,
+  defaultTransaction,
+  TransactionContextType,
+  WithdrawActivity,
+} from "./types";
 
-export const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
+export const TransactionContext = createContext<
+  TransactionContextType | undefined
+>(undefined);
 
-export const TransactionProvider = ({ children } : { children: ReactNode}) => {
-  const [transactions, setTransactions] = useState<Map<string, Transaction>>(new Map());
-  const [withdrawTransactions, setWithdrawTransactions]= useState<Map<BigInt, WithdrawActivity>>(new Map());
+export const TransactionProvider = ({ children }: { children: ReactNode }) => {
+  const [transactions, setTransactions] = useState<Map<string, Transaction>>(
+    new Map()
+  );
+  const [withdrawTransactions, setWithdrawTransactions] = useState<
+    Map<BigInt, WithdrawActivity>
+  >(new Map());
   const [deposits, setDeposits] = useState<any[] | null>(null);
   const [withdrawals, setWithdrawals] = useState<any[] | null>(null);
-  const [pendingTransactions, setPendingTransactions] = useState<Transaction[]>([]);
-  const [lastAddress, setLastAddress] = useState<string>('');
-  const [viemClient, setClient] = useState<PublicClient | null>(null)
-  const { selectedOption, bridgeProgram, eclipseRpc, withdrawApi, legacyAddress } = useNetwork();
+  const [pendingTransactions, setPendingTransactions] = useState<Transaction[]>(
+    []
+  );
+  const [lastAddress, setLastAddress] = useState<string>("");
+  const [viemClient, setClient] = useState<PublicClient | null>(null);
+  const {
+    selectedOption,
+    bridgeProgram,
+    eclipseRpc,
+    withdrawApi,
+    legacyAddress,
+  } = useNetwork();
 
   const { evmWallet } = useWallets();
   const fetchDeposits = async () => {
-    const relayTransactions = await queryRequests(undefined, { user: evmWallet?.address });
-    console.log(relayTransactions, "relaytransactions")
+    const relayTransactions = await queryRequests(undefined, {
+      user: evmWallet?.address,
+    });
+    console.log(relayTransactions, "relaytransactions");
     try {
-      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+      const delay = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
       setDeposits([]);
       setWithdrawals([]);
       // fix
       let data: any[] = [];
       try {
-        data = await getLastDeposits(evmWallet?.address || '', (selectedOption === Options.Mainnet) ? "mainnet" : "testnet");
+        data = await getLastDeposits(
+          evmWallet?.address || "",
+          selectedOption === Options.Mainnet ? "mainnet" : "testnet"
+        );
         setDeposits(data.reverse());
       } catch (error) {
-        console.log("failed to fetch deposits", error)
+        console.log("failed to fetch deposits", error);
       }
 
       try {
-        const withdrawalsData = await getWithdrawalsByAddress(evmWallet?.address || '', withdrawApi, legacyAddress);
-        setWithdrawals(withdrawalsData)
+        const withdrawalsData = await getWithdrawalsByAddress(
+          evmWallet?.address || "",
+          withdrawApi,
+          legacyAddress
+        );
+        setWithdrawals(withdrawalsData);
         withdrawalsData.forEach(async (item, index) => {
           await delay(index * 300);
-          addNewWithdrawal(item)
+          addNewWithdrawal(item);
         });
       } catch (error) {
-        console.log("failed to fetch withdrawals", error)
+        console.log("failed to fetch withdrawals", error);
       }
 
-
-     const processTransactions = async (data: any[]) => {
-       data.forEach(async (tx, index) => {
-         await delay(index * 300);
-         addTransactionListener(tx.hash, tx.txreceipt_status);
-      });
+      const processTransactions = async (data: any[]) => {
+        if (!Array.isArray(data)) {
+          console.warn("processTransactions expected an array but got:", data);
+          return;
+        }
+        data.forEach(async (tx, index) => {
+          await delay(index * 300);
+          addTransactionListener(tx.hash, tx.txreceipt_status);
+        });
       };
       processTransactions(data);
     } catch (error) {
@@ -66,23 +113,28 @@ export const TransactionProvider = ({ children } : { children: ReactNode}) => {
     }
   };
 
-  useEffect(() =>{
-    const isMainnet = (selectedOption === Options.Mainnet);
-    console.log("isMainnet", isMainnet)
+  useEffect(() => {
+    const isMainnet = selectedOption === Options.Mainnet;
+    console.log("isMainnet", isMainnet);
     const client = createPublicClient({
-      chain    : isMainnet ? mainnet : sepolia,
+      chain: isMainnet ? mainnet : sepolia,
       transport: isMainnet
-        ? http("https://empty-responsive-patron.quiknode.pro/91dfa8475605dcdec9afdc8273578c9f349774a1/")
+        ? http(
+            "https://empty-responsive-patron.quiknode.pro/91dfa8475605dcdec9afdc8273578c9f349774a1/"
+          )
         : http("https://sepolia.drpc.org"),
-      cacheTime: 0
-    })
+      cacheTime: 0,
+    });
     setClient(client);
     setPendingTransactions([]);
     fetchDeposits();
-  }, [selectedOption])
+  }, [selectedOption]);
 
   useEffect(() => {
-    if (evmWallet?.address.startsWith("0x") && (evmWallet?.address !== lastAddress)) {
+    if (
+      evmWallet?.address.startsWith("0x") &&
+      evmWallet?.address !== lastAddress
+    ) {
       setLastAddress(evmWallet?.address);
       fetchDeposits();
     }
@@ -90,25 +142,36 @@ export const TransactionProvider = ({ children } : { children: ReactNode}) => {
 
   const addNewDeposit = (txData: any) => {
     setDeposits((prev: any) => [txData, ...prev]);
-  }
+  };
 
   const addNewWithdrawal = async (withdrawal: WithdrawObject) => {
-    const pda = await getWithdrawalPda(bridgeProgram, withdrawal[0].message.withdraw_id);
+    const pda = await getWithdrawalPda(
+      bridgeProgram,
+      withdrawal[0].message.withdraw_id
+    );
     const txHash = await getEclipseTransaction(pda, eclipseRpc);
 
     const newObject: WithdrawActivity = {
       amount: withdrawal[0].message.amount_wei,
-      pda: pda?.toString() || '',
-      transaction: txHash[0]
-    }
-    setWithdrawTransactions((prev) => new Map(prev.set(withdrawal[0].message.withdraw_id, newObject)));
-  }
+      pda: pda?.toString() || "",
+      transaction: txHash[0],
+    };
+    setWithdrawTransactions(
+      (prev) => new Map(prev.set(withdrawal[0].message.withdraw_id, newObject))
+    );
+  };
 
   const addTransactionListener = (txHash: string, l1Status: string) => {
     if (transactions.has(txHash)) {
       return;
     }
-    const newTransaction: Transaction = { hash: txHash, status: 'pending', pdaData: undefined, eclipseTxHash: null, pda: null};
+    const newTransaction: Transaction = {
+      hash: txHash,
+      status: "pending",
+      pdaData: undefined,
+      eclipseTxHash: null,
+      pda: null,
+    };
     setTransactions((prev) => new Map(prev.set(txHash, newTransaction)));
     setPendingTransactions((prev) => [...prev, newTransaction]);
 
@@ -116,24 +179,25 @@ export const TransactionProvider = ({ children } : { children: ReactNode}) => {
   };
 
   const checkTransactionStatus = (txHash: string, l1Status: string) => {
-    const isMainnet = (selectedOption === Options.Mainnet);
+    const isMainnet = selectedOption === Options.Mainnet;
     const client = createPublicClient({
-      chain    : isMainnet ? mainnet : sepolia,
+      chain: isMainnet ? mainnet : sepolia,
       transport: isMainnet ? http() : http("https://sepolia.drpc.org"),
-      cacheTime: 0
-    })
+      cacheTime: 0,
+    });
     const fetchEclipseTx = async () => {
       const oldTx = transactions.get(txHash) ?? defaultTransaction;
-      const pda     = oldTx.pda ?? await getNonce(client, txHash, bridgeProgram);
-      const eclTx   = oldTx.eclipseTxHash ?? await getEclipseTransaction(pda, eclipseRpc);
+      const pda = oldTx.pda ?? (await getNonce(client, txHash, bridgeProgram));
+      const eclTx =
+        oldTx.eclipseTxHash ?? (await getEclipseTransaction(pda, eclipseRpc));
       const pdaData = await checkDepositWithPDA(pda, eclipseRpc);
 
       const updatedTransaction: Transaction = {
         hash: txHash,
         status: pdaData ? "confirmed" : "pending",
-        eclipseTxHash: eclTx && (eclTx.length > 0 ?  eclTx[0].signature : null),
+        eclipseTxHash: eclTx && (eclTx.length > 0 ? eclTx[0].signature : null),
         pdaData: pdaData,
-        pda: pda ? pda : null
+        pda: pda ? pda : null,
       };
 
       // update tx
@@ -143,10 +207,14 @@ export const TransactionProvider = ({ children } : { children: ReactNode}) => {
         return updated;
       });
 
-      (pdaData || l1Status	=== "0" ) && setPendingTransactions((prev) =>
-        prev.filter((tx) => tx.hash !== txHash)
-      );
-      if ((!pdaData || !eclTx) && (l1Status !== "0")) setTimeout(() => {fetchEclipseTx()}, 2000);
+      (pdaData || l1Status === "0") &&
+        setPendingTransactions((prev) =>
+          prev.filter((tx) => tx.hash !== txHash)
+        );
+      if ((!pdaData || !eclTx) && l1Status !== "0")
+        setTimeout(() => {
+          fetchEclipseTx();
+        }, 2000);
     };
 
     fetchEclipseTx();
@@ -157,7 +225,8 @@ export const TransactionProvider = ({ children } : { children: ReactNode}) => {
   };
 
   return (
-    <TransactionContext.Provider value={{
+    <TransactionContext.Provider
+      value={{
         transactions,
         withdrawals,
         addTransactionListener,
@@ -166,12 +235,13 @@ export const TransactionProvider = ({ children } : { children: ReactNode}) => {
         deposits,
         addNewDeposit,
         withdrawTransactions,
-        setWithdrawals
-      }}>
+        setWithdrawals,
+      }}
+    >
       {children}
     </TransactionContext.Provider>
   );
-}
+};
 
 export const useTransaction = () => {
   const context = useContext(TransactionContext);
