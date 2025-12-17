@@ -52,7 +52,7 @@ export function useTransactions() {
     async function fetchTransactions() {
       try {
         setIsLoading(true);
-        const baseUrl = "https://api.nucleusearn.io/prod//";
+        const baseUrl = "https://api.nucleusearn.io/prod/";
         const method = "unfulfilled";
         const chainId = 1;
         const statuses = ["pending", "fulfilled", "cancelled"];
