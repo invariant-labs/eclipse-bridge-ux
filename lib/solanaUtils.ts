@@ -12,7 +12,7 @@ export async function getWalletBalance(publicKey: String, eclipseRpc: string) {
 
   // Fetch the balance
   const balance = await connection.getBalance(
-    new solanaWeb3.PublicKey(publicKey),
+    new solanaWeb3.PublicKey(publicKey)
   );
 
   // Convert balance from lamports to SOL (1 SOL = 10^9 lamports)
@@ -20,7 +20,7 @@ export async function getWalletBalance(publicKey: String, eclipseRpc: string) {
 }
 
 export async function getTokenBalance(tokenMint: string, wallet: string) {
-  const eclipseRpcUrl = process.env.NEXT_PUBLIC_ECLIPSE_RPC;
+  const eclipseRpcUrl = "https://mainnetbeta-rpc.eclipse.xyz";
   const connection = new Connection(eclipseRpcUrl ?? "", "finalized");
 
   const mintAddress = new PublicKey(tokenMint);
@@ -31,11 +31,11 @@ export async function getTokenBalance(tokenMint: string, wallet: string) {
     mintAddress,
     walletAddress,
     false,
-    TOKEN_2022_PROGRAM_ID,
+    TOKEN_2022_PROGRAM_ID
   );
   try {
     const tokenAccount = await connection.getTokenAccountBalance(
-      associatedTokenAddress,
+      associatedTokenAddress
     );
     const tokenBalance = tokenAccount.value;
 

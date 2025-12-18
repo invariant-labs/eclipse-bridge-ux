@@ -52,7 +52,7 @@ export function useTransactions() {
     async function fetchTransactions() {
       try {
         setIsLoading(true);
-        const baseUrl = process.env.NEXT_PUBLIC_NUCLEUS_API_URL || "";
+        const baseUrl = "https://api.nucleusearn.io/prod/";
         const method = "unfulfilled";
         const chainId = 1;
         const statuses = ["pending", "fulfilled", "cancelled"];
@@ -62,15 +62,20 @@ export function useTransactions() {
         const transactions = (
           await Promise.all(
             statuses.map(async (status) => {
-              const apiUrl = `${baseUrl}/${method}?vaultAddress=${boringVaultAddress}&chainId=${chainId}&status=${status}`;
+              const apiUrl = `${baseUrl}/${method}?vaultAddress=${boringVaultAddress}&chainId=${chainId}&status=${status}&user=${evmAddress}`;
               const responseAsJson = await fetch(apiUrl);
-              const response = (await responseAsJson.json()).data as RawNucleusTransaction[];
-              return response.map(convertRawTransactionToTransaction).filter((tx) => tx.user === evmAddress);
+              const response = (await responseAsJson.json())
+                .data as RawNucleusTransaction[];
+              return response
+                .map(convertRawTransactionToTransaction)
+                .filter((tx) => tx.user === evmAddress);
             })
           )
         )
           .flat()
-          .sort((a, b) => Number(b.createdTimestamp) - Number(a.createdTimestamp));
+          .sort(
+            (a, b) => Number(b.createdTimestamp) - Number(a.createdTimestamp)
+          );
 
         setTransactions(transactions);
       } catch (error) {
@@ -87,7 +92,9 @@ export function useTransactions() {
 }
 
 // Converts the snake case fields from the nucleus API to camel case
-function convertRawTransactionToTransaction(raw: RawNucleusTransaction): NucleusTransaction {
+function convertRawTransactionToTransaction(
+  raw: RawNucleusTransaction
+): NucleusTransaction {
   return {
     id: raw.id,
     user: raw.user,

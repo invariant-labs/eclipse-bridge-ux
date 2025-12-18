@@ -8,12 +8,12 @@ import { StepStatus } from "../types";
 
 export function useTokenTransfer() {
   const [transactionState, setTransactionState] = useState<StepStatus>(
-    StepStatus.NOT_STARTED,
+    StepStatus.NOT_STARTED
   );
   const [error, setError] = useState<string | null>(null);
   const { evmWallet, solWallet } = useWallets();
   const [interchainTransferFee, setInterchainTransferFee] = useState<bigint>(
-    BigInt(0),
+    BigInt(0)
   );
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export function useTokenTransfer() {
       try {
         const originToken = warpCore.tokens.find(
           (token) =>
-            token.chainName === "eclipsemainnet" && token.symbol === "tETH",
+            token.chainName === "eclipsemainnet" && token.symbol === "tETH"
         );
         if (!originToken || !solWallet?.address) {
           return;
@@ -49,7 +49,7 @@ export function useTokenTransfer() {
       setTransactionState(StepStatus.AWAITING_SIGNATURE);
       try {
         const connection = new Connection(
-          process.env.NEXT_PUBLIC_ECLIPSE_RPC || "",
+          "https://mainnetbeta-rpc.eclipse.xyz"
         );
 
         // Define paramaters
@@ -87,7 +87,7 @@ export function useTokenTransfer() {
             }
             const signedTx = await signer.signTransaction(tx.transaction);
             const txId = await connection.sendRawTransaction(
-              signedTx.serialize(),
+              signedTx.serialize()
             );
             await connection.confirmTransaction(txId, "confirmed");
           }
@@ -101,7 +101,7 @@ export function useTokenTransfer() {
         throw e;
       }
     },
-    [evmWallet, solWallet],
+    [evmWallet, solWallet]
   );
 
   return {

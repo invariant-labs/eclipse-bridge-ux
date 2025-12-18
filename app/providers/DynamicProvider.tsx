@@ -112,7 +112,7 @@ export const eclipseWallets = [
   "bybitwalletsol",
   "bitgetwalletsol",
   "fordefisol",
-  "gatewalletsol"
+  "gatewalletsol",
 ];
 
 export const DynamicProvider = (props: {
@@ -155,23 +155,23 @@ export const DynamicProvider = (props: {
           },
           onAuthFlowOpen: () => {
             const depositBox = document.getElementsByClassName(
-              "deposit-container",
+              "deposit-container"
             )[0] as HTMLElement;
             depositBox.style.transform = "scale(0.9)";
 
             const mainContent = document.getElementById(
-              "main-content",
+              "main-content"
             ) as HTMLElement;
             mainContent.style.filter = "blur(3px)";
           },
           onAuthFlowClose: () => {
             const depositBox = document.getElementsByClassName(
-              "deposit-container",
+              "deposit-container"
             )[0] as HTMLElement;
             depositBox.style.transform = "";
 
             const mainContent = document.getElementById(
-              "main-content",
+              "main-content"
             ) as HTMLElement;
             mainContent.style.filter = "";
             setWalletFilter(undefined);
@@ -186,7 +186,7 @@ export const DynamicProvider = (props: {
             }
           },
         },
-        environmentId: process.env.NEXT_PUBLIC_ENVIRONMENT_ID || "",
+        environmentId: "cb7c0e48-7952-4d3c-82b9-005f7a29aa14",
         walletConnectors: [
           EthereumWalletConnectors,
           SolanaWalletConnectors,
@@ -200,7 +200,7 @@ export const DynamicProvider = (props: {
         overrides: {
           solNetworks: (networks) => {
             return networks.filter((n) =>
-              isDynamicEclipseNetworkId(parseInt(n.networkId.toString())),
+              isDynamicEclipseNetworkId(parseInt(n.networkId.toString()))
             );
           },
           evmNetworks: (networks) => {
@@ -212,7 +212,7 @@ export const DynamicProvider = (props: {
               });
             return mergeNetworks(
               evmNetworks,
-              mergeNetworks(networks, relayNetworks),
+              mergeNetworks(networks, relayNetworks)
             );
           },
           chainDisplayValues: {
@@ -225,7 +225,7 @@ export const DynamicProvider = (props: {
         bridgeChains: [
           ...((isMobile ? [] : [{ chain: "EVM" }, { chain: "SOL" }]) as [
             { chain: "EVM" },
-            { chain: "SOL" },
+            { chain: "SOL" }
           ]),
         ],
       }}

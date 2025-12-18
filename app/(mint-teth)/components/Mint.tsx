@@ -71,23 +71,23 @@ export function Mint() {
   > | null>(null);
   const [depositAmount, setDepositAmount] = useState<string>("");
   const [depositAsset, setDepositAsset] = useState<`0x${string}`>(
-    tokenAddresses[0],
+    tokenAddresses[0]
   );
   const [tethPerAssetRate, setTethPerAssetRate] = useState<string>("");
   const [ethPerAssetRate, setEthPerAssetRate] = useState("");
   const [ethPerTethRate, setEthPerTethRate] = useState("");
   const [depositPending, setDepositPending] = useState<boolean>(false);
   const [tokenBalanceAsBigInt, setTokenBalanceAsBigInt] = useState<bigint>(
-    BigInt(0),
+    BigInt(0)
   );
   const [loadingTokenBalance, setLoadingTokenBalance] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTx, setCurrentTx] = useState<any>(null);
   const [approveStatus, setApproveStatus] = useState<StepStatus>(
-    StepStatus.NOT_STARTED,
+    StepStatus.NOT_STARTED
   );
   const [depositStatus, setDepositStatus] = useState<StepStatus>(
-    StepStatus.NOT_STARTED,
+    StepStatus.NOT_STARTED
   );
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.Mint);
   const [depositTxHash, setDepositTxHash] = useState<string>("");
@@ -101,7 +101,7 @@ export function Mint() {
   const publicClient = createPublicClient({
     chain: mainnet,
     transport: http(
-      "https://empty-responsive-patron.quiknode.pro/91dfa8475605dcdec9afdc8273578c9f349774a1/",
+      "https://empty-responsive-patron.quiknode.pro/91dfa8475605dcdec9afdc8273578c9f349774a1/"
     ),
     cacheTime: 0,
   });
@@ -136,15 +136,15 @@ export function Mint() {
   const depositAmountInUsd =
     (depositAmountInEth * ethPriceAsBigInt) / BigInt(1e8);
   const depositAmountInUsdFormatted = Number(
-    formatUnits(depositAmountInUsd, 18),
+    formatUnits(depositAmountInUsd, 18)
   );
   const formattedDepositAmountInUsd =
     depositAmountInUsdFormatted > 0 && depositAmountInUsdFormatted < 0.01
       ? "<$0.01"
       : `$${new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(depositAmountInUsdFormatted)}`;
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(depositAmountInUsdFormatted)}`;
 
   const receiveAmountInEth =
     (receiveAmountAsBigInt * BigInt(ethPerTethRate)) / BigInt(1e18);
@@ -161,15 +161,15 @@ export function Mint() {
   const receiveAmountInUsd =
     (receiveAmountInEth * ethPriceAsBigInt) / BigInt(1e8);
   const receiveAmountInUsdFormatted = Number(
-    formatUnits(receiveAmountInUsd, 18),
+    formatUnits(receiveAmountInUsd, 18)
   );
   const formattedReceiveAmountInUsd =
     receiveAmountInUsdFormatted > 0 && receiveAmountInUsdFormatted < 0.01
       ? "<$0.01"
       : `$${new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(receiveAmountInUsdFormatted)}`;
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(receiveAmountInUsdFormatted)}`;
 
   // Memoized because it returns a new array on every render
   const steps = useMemo(() => {
@@ -183,7 +183,7 @@ export function Mint() {
         status: depositStatus,
         link: composeEtherscanUrl(
           selectedOption,
-          composeEtherscanCompatibleTxPath(depositTxHash),
+          composeEtherscanCompatibleTxPath(depositTxHash)
         ),
       },
     ];
@@ -192,7 +192,7 @@ export function Mint() {
   // Memoized because it iterates over an array
   const { depositAssetLabel, depositAssetIcon } = useMemo(() => {
     const tokenOption = tokenOptions.find(
-      (token) => token.value === depositAsset,
+      (token) => token.value === depositAsset
     );
     return {
       depositAssetLabel: tokenOption?.label,
@@ -258,12 +258,12 @@ export function Mint() {
       } else {
         _ethPerAssetRate = await getRate(
           { tokenAddress: asset },
-          { publicClient },
+          { publicClient }
         );
       }
       const _ethPerTethRate = await getRateInQuote(
         { quote: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" }, // WETH
-        { publicClient },
+        { publicClient }
       );
       const _ethPrice = await latestRoundData({ publicClient });
 
@@ -364,8 +364,9 @@ export function Mint() {
         console.log("approvalRequest", approvalRequest);
 
         // Execute the transaction
-        const approvalTxHash =
-          await walletClient.writeContract(approvalRequest);
+        const approvalTxHash = await walletClient.writeContract(
+          approvalRequest
+        );
 
         // Wait for the approval transaction to be confirmed
         await publicClient.waitForTransactionReceipt({
@@ -390,7 +391,7 @@ export function Mint() {
       ////////////////////////////////
       const rate = await getRateInQuote(
         { quote: depositAsset },
-        { publicClient },
+        { publicClient }
       );
       const minimumMint = calculateMinimumMint(depositAmountAsBigInt, rate);
 
@@ -403,7 +404,7 @@ export function Mint() {
         {
           publicClient,
           contractAddress: "0xc2495f3183F043627CAECD56dAaa726e3B2D9c09",
-        },
+        }
       );
       // Simulate the transaction to catch any errors
       const simulateParams: any = {
@@ -424,8 +425,9 @@ export function Mint() {
       // This won't affect other wallets that already have chain info
       simulateParams.chain = mainnet;
 
-      const { request: depositRequest } =
-        await publicClient.simulateContract(simulateParams);
+      const { request: depositRequest } = await publicClient.simulateContract(
+        simulateParams
+      );
 
       // Execute the transaction
       const txHash = await walletClient.writeContract(depositRequest);
@@ -450,7 +452,7 @@ export function Mint() {
 
       const txData = await generateTxObjectForDetails(
         provider ? provider.provider : publicClient,
-        txHash,
+        txHash
       );
 
       setCurrentTx(txData);
@@ -522,7 +524,7 @@ export function Mint() {
               loadingTokenBalance={loadingTokenBalance}
               onChangeInput={handleDepositAmountChange}
               depositAsset={tokenOptions.find(
-                (token) => token.value === depositAsset,
+                (token) => token.value === depositAsset
               )}
               onChangeDepositAsset={handleDepositAssetChange}
               isOverBalance={isOverBalance}

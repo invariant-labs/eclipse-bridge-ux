@@ -81,7 +81,7 @@ export function Redeem() {
   const [ethPerTethRate, setEthPerTethRate] = useState("");
   const [depositPending, setDepositPending] = useState<boolean>(false);
   const [tokenBalanceAsBigInt, setTokenBalanceAsBigInt] = useState<bigint>(
-    BigInt(1),
+    BigInt(1)
   );
   const [isLoadingTokenBalance, setIsLoadingTokenBalance] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,7 +91,7 @@ export function Redeem() {
   const [tethBalanceLoading, setTethBalanceLoading] = useState(false);
   const [ethPrice, setEthPrice] = useState<string>("");
   const [sourceChain, setSourceChain] = useState<SelectOption | undefined>(
-    chainOptions[0],
+    chainOptions[0]
   );
 
   ///////////////////////
@@ -100,7 +100,7 @@ export function Redeem() {
   const publicClient = createPublicClient({
     chain: mainnet,
     transport: http(
-      "https://empty-responsive-patron.quiknode.pro/91dfa8475605dcdec9afdc8273578c9f349774a1/",
+      "https://empty-responsive-patron.quiknode.pro/91dfa8475605dcdec9afdc8273578c9f349774a1/"
     ),
     cacheTime: 0,
   });
@@ -126,9 +126,9 @@ export function Redeem() {
     withdrawFeeInUsd > 0 && withdrawFeeInUsd < 0.01
       ? "<$0.01"
       : `$${new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(withdrawFeeInUsd)}`;
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(withdrawFeeInUsd)}`;
 
   // Bridge fee
   const bridgeFeeInUsdAsBigInt =
@@ -138,9 +138,9 @@ export function Redeem() {
     bridgeFeeInUsd > 0 && bridgeFeeInUsd < 0.01
       ? "<$0.01"
       : `$${new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(bridgeFeeInUsd)}`;
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(bridgeFeeInUsd)}`;
 
   // Total fees
   const totalFeesInEth = withdrawFeeInEth + interchainTransferFee;
@@ -151,9 +151,9 @@ export function Redeem() {
     totalFeesInUsd > 0 && totalFeesInUsd < 0.01
       ? "<$0.01"
       : `$${new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(totalFeesInUsd)}`;
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(totalFeesInUsd)}`;
 
   const isOverBalance = BigInt(tethBalance) < redeemAmountAsBigInt;
 
@@ -180,9 +180,9 @@ export function Redeem() {
     redeemAmountInUsdFormatted > 0 && redeemAmountInUsdFormatted < 0.01
       ? "<$0.01"
       : `$${new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(redeemAmountInUsdFormatted)}`;
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(redeemAmountInUsdFormatted)}`;
 
   // Receive amount
   const receiveAmountAsBigInt =
@@ -198,20 +198,20 @@ export function Redeem() {
   const receiveAmountInUsd =
     (receiveAmountInEth * ethPriceAsBigInt) / BigInt(1e8);
   const receiveAmountInUsdFormatted = Number(
-    formatUnits(receiveAmountInUsd, 18),
+    formatUnits(receiveAmountInUsd, 18)
   );
   const formattedReceiveAmountInUsd =
     receiveAmountInUsdFormatted > 0 && receiveAmountInUsdFormatted < 0.01
       ? "<$0.01"
       : `$${new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(receiveAmountInUsdFormatted)}`;
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(receiveAmountInUsdFormatted)}`;
 
   // Memoized because it iterates over an array
   const { depositAssetLabel, depositAssetIcon } = useMemo(() => {
     const tokenOption = tokenOptions.find(
-      (token) => token.value === receiveAsset,
+      (token) => token.value === receiveAsset
     );
     return {
       depositAssetLabel: tokenOption?.label,
@@ -265,7 +265,7 @@ export function Redeem() {
         if (sourceChain?.value === "eclipse" && svmAddress) {
           const balance = await getSolanaBalance(
             svmAddress,
-            tethSvmTokenAddress,
+            tethSvmTokenAddress
           );
           setTethBalance(balance.toString());
         } else if (
@@ -310,12 +310,12 @@ export function Redeem() {
       } else {
         _ethPerAssetRate = await getRate(
           { tokenAddress: asset },
-          { publicClient },
+          { publicClient }
         );
       }
       const _ethPerTethRate = await getRateInQuote(
         { quote: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" }, // WETH
-        { publicClient },
+        { publicClient }
       );
       const _ethPrice = await latestRoundData({ publicClient });
 
@@ -406,7 +406,7 @@ export function Redeem() {
 
       // Make the swap (this step takes up to 24 hours)
       const deadlineInSec = BigInt(
-        Math.floor(Date.now() / 1000) + deadlineDaysFromNow * 24 * 60 * 60,
+        Math.floor(Date.now() / 1000) + deadlineDaysFromNow * 24 * 60 * 60
       );
       const offerAmount = parseUnits(redeemAmount, 18);
 
@@ -440,7 +440,7 @@ export function Redeem() {
             offerAddress: tethEvmTokenAddress,
             wantAddress: receiveAsset as `0x${string}`,
           },
-          { publicClient },
+          { publicClient }
         );
         const {
           atomicPrice: pendingAtomicPrice,
@@ -462,7 +462,7 @@ export function Redeem() {
                 inSolve: false,
               },
             },
-            { publicClient, walletClient },
+            { publicClient, walletClient }
           );
         } else {
           setAtomicRequestState(StepStatus.LOADING);
@@ -540,7 +540,7 @@ export function Redeem() {
           inputValue={formattedReceiveAmount}
           disabled={true}
           depositAsset={tokenOptions.find(
-            (token) => token.value === receiveAsset,
+            (token) => token.value === receiveAsset
           )}
           tokenBalance={tokenBalanceAsBigInt}
           usdValue={formattedReceiveAmountInUsd}
