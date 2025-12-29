@@ -1,6 +1,6 @@
 import "./sidebar.css";
 import Link from "next/link";
-import { TethIcon } from "@/app/components/icons";
+import { TethIcon, TusdIcon } from "@/app/components/icons";
 import { NetworkSwitcher } from "../Deposit/NetworkSwitcher";
 import { useState, type ReactNode } from "react";
 import { toKebabCase } from "@/lib/stringUtils";
@@ -44,13 +44,23 @@ const SidebarItem: React.FC<{
   const { selectedOption } = useNetwork();
   const [hover, setHover] = useState(false);
   const pathName = usePathname();
+
   let targetHref = toKebabCase(name);
+
+  if (name === "Mint tETH") {
+    targetHref = "/";
+  }
+
   if (targetHref === "eclipsescan") {
     targetHref = composeEclipsescanUrl(selectedOption);
   }
   if (targetHref === "ecosystem") {
     targetHref = "https://www.eclipse.xyz/ecosystem";
   }
+
+  const isActive =
+    pathName.slice(1) === toKebabCase(name) ||
+    (pathName === "/" && name === "Mint tETH");
 
   return (
     <Link
@@ -59,7 +69,7 @@ const SidebarItem: React.FC<{
     >
       <div
         className={`side-item flex flex-row items-center ${
-          pathName.slice(1) === toKebabCase(name) ? "highlight-icon" : ""
+          isActive ? "highlight-icon" : ""
         }`}
         style={{
           gap: "11px",
@@ -116,7 +126,6 @@ export const Sidebar: React.FC<{
       style={{ width: isExtended ? "215px" : "66px" }}
     >
       <div>
-        <NetworkSwitcher isExtended={isExtended} />
         <div
           className="sidebar-tabs flex flex-col"
           style={{ marginTop: "14px", marginLeft: "14px" }}
@@ -125,6 +134,11 @@ export const Sidebar: React.FC<{
             isExtended={isExtended}
             name="Mint tETH"
             icon={<TethIcon />}
+          />
+          <SidebarItem
+            isExtended={isExtended}
+            name="Mint tUSD"
+            icon={<TusdIcon />}
           />
         </div>
       </div>
